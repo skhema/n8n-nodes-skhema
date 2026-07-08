@@ -1,0 +1,96 @@
+# Publishes @skhema/n8n-nodes-skhema to npm via OIDC Trusted Publishing —
+# token-free, with a provenance attestation (required for n8n verified
+# community nodes; provenance requires this repository to remain PUBLIC).
+#
+# ─── ONE-TIME SETUP ───────────────────────────────────────────────────────────
+# 1. npmjs.com → @skhema/n8n-nodes-skhema → Settings → Trusted Publisher:
+#      Organization/owner: skhema
+#      Repository:         n8n-nodes-skhema
+#      Workflow filename:  publish.yml
+#      Environment:        npm-publish
+# 2. GitHub repo Settings → Environments → create `npm-publish`
+#    (no required reviewers).
+# No NPM_TOKEN anywhere — publish auth is the OIDC exchange.
+#
+# ─── RELEASE ──────────────────────────────────────────────────────────────────
+# Bump `version` in package.json (+ lockfile) on main; the workflow publishes
+# when the version isn't on the registry yet.
+
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build + verify only; skip the publish step'
+        type: boolean
+        default: false
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to npm (OIDC)
+    runs-on: ubuntu-latest # GitHub-hosted runner required for OIDC
+    environment: npm-publish # must match the trusted-publisher registration
+
+    permissions:
+      id-token: write # mint the OIDC token + sign provenance
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0' # >= 22.14 required by npm OIDC publishing
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Upgrade npm to OIDC-capable version
+        run: |
+          npm install -g npm@latest
+          npm --version # must be >= 11.5.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Offline verification
+        run: node scripts/verify-offline.js
+
+      - name: Skip if version already published
+        id: check
+        run: |
+          LOCAL=$(node -p "require('./package.json').version")
+          PUBLISHED=$(npm view "@skhema/n8n-nodes-skhema@$LOCAL" version 2>/dev/null || echo "none")
+          echo "local=$LOCAL published=$PUBLISHED"
+          if [ "$LOCAL" = "$PUBLISHED" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish (provenance, public)
+        if: steps.check.outputs.publish == 'true' && inputs.dry_run != true
+        # RELEASE_MODE satisfies the `n8n-node prerelease` prepublishOnly guard.
+        env:
+          RELEASE_MODE: 'true'
+        run: npm publish --provenance
+
+      - name: Nothing to publish
+        if: steps.check.outputs.publish != 'true'
+        run: echo "Version already on the registry — nothing to publish."

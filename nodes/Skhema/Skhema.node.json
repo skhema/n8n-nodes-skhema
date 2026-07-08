@@ -1,0 +1,18 @@
+{
+	"node": "@skhema/n8n-nodes-skhema.skhema",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Productivity"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/skhema/skhema-integrations/tree/main/integrations/n8n#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/skhema/skhema-integrations/tree/main/integrations/n8n"
+			}
+		]
+	}
+}
