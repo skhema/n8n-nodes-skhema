@@ -23,12 +23,19 @@ Self-hosted n8n requires **Node.js 20.19–24**.
 
 ## Credentials
 
-The node authenticates with **Skhema OAuth2** (Authorization Code + PKCE). A
-connection represents your Skhema **organization**.
+The node authenticates with **Skhema OAuth2** (Authorization Code + PKCE, as a
+public client — no client secret). A connection represents your Skhema
+**organization**.
 
-1. Add a new **Skhema OAuth2 API** credential in n8n.
-2. Enter the **Client ID** and **Client Secret** of your Skhema OAuth client
-   (the authorization endpoints and scopes are pre-configured).
+1. In Skhema, have an organization **owner or admin** register your n8n
+   instance's OAuth callback URL under **Connections**:
+   `https://<your-instance>/rest/oauth2-credential/callback`
+   (for n8n Cloud: `https://<workspace>.app.n8n.cloud/rest/oauth2-credential/callback`).
+   Skhema refuses OAuth flows targeting unregistered callbacks — this is what
+   ties a connection to *your* instance.
+2. Add a new **Skhema OAuth2 API** credential in n8n. The Client ID is
+   prefilled (Skhema's shared public client) and there is no secret to enter;
+   the endpoints and scopes are pre-configured.
 3. Click **Connect** and authorize as an organization admin or owner, selecting
    the organization the connection should act for.
 
