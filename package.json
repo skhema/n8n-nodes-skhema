@@ -1,10 +1,10 @@
 {
 	"name": "@skhema/n8n-nodes-skhema",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"publishConfig": {
 		"access": "public"
 	},
-	"description": "n8n community node for Skhema \u2014 the strategy platform. Trigger on new users and workspace members, create workspaces and elements, and complete member compliance.",
+	"description": "n8n community node for Skhema — the strategy platform. Trigger on new users and workspace members, create workspaces and elements, and complete member compliance.",
 	"license": "MIT",
 	"homepage": "https://skhema.com",
 	"keywords": [
