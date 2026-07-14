@@ -92,6 +92,7 @@ check('element-type validity matrix (mirrors Zapier ELEMENT_FLOW)', () => {
 check('listSearch loaders', () => {
 	assert.deepStrictEqual(Object.keys(skhema.methods.listSearch).sort(), [
 		'getComplianceRequirements',
+		'getWorkspaceComponents',
 		'getWorkspaceMembers',
 		'getWorkspaces',
 	]);
