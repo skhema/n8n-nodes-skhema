@@ -1,6 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 import {
 	COMPONENT_OPTIONS,
+	componentLocator,
 	elementTypeProperties,
 	workspaceLocator,
 } from '../../shared/descriptions';
@@ -56,6 +57,21 @@ export const elementDescription: INodeProperties[] = [
 	},
 	// One elementType property per component (encodes the validity matrix).
 	...elementTypeProperties,
+	{
+		...componentLocator,
+		displayOptions: { show: showForElementCreate },
+		// Extract the resource-locator id into the body. Left blank it resolves to
+		// '' and presendPruneEmpty drops it, preserving the default first-instance
+		// behaviour (`.value ?? param` is safe whether or not the engine
+		// pre-extracts the `__rl` value).
+		routing: {
+			send: {
+				type: 'body',
+				property: 'componentId',
+				value: '={{ $parameter["componentId"].value ?? $parameter["componentId"] }}',
+			},
+		},
+	},
 	{
 		displayName: 'Content',
 		name: 'content',

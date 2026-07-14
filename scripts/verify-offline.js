@@ -25,6 +25,7 @@ const { Workflow } = require('n8n-workflow');
 const { Skhema } = require('../dist/nodes/Skhema/Skhema.node.js');
 const { SkhemaTrigger } = require('../dist/nodes/SkhemaTrigger/SkhemaTrigger.node.js');
 const { SkhemaOAuth2Api } = require('../dist/credentials/SkhemaOAuth2Api.credentials.js');
+const { presendPruneEmpty } = require('../dist/nodes/Skhema/shared/helpers.js');
 
 let failures = 0;
 const check = (label, fn) => {
@@ -92,6 +93,7 @@ check('element-type validity matrix (mirrors Zapier ELEMENT_FLOW)', () => {
 check('listSearch loaders', () => {
 	assert.deepStrictEqual(Object.keys(skhema.methods.listSearch).sort(), [
 		'getComplianceRequirements',
+		'getWorkspaceComponents',
 		'getWorkspaceMembers',
 		'getWorkspaces',
 	]);
@@ -252,6 +254,70 @@ for (const c of cases) {
 			assert.ok(!/\/\//.test(String(resolved)), 'URL contains an empty path segment');
 		});
 	}
+}
+
+// ─── 3. element.create componentId body contract ────────────────────────────
+// The optional Component Instance locator routes to the request body via a
+// send.value expression, then presendPruneEmpty drops it when blank. Assert the
+// full contract through the real expression engine + the real preSend helper:
+// an unselected/blank locator (any mode) must produce a body with NO componentId
+// key (byte-identical to today's behaviour), and a populated locator must route
+// the plain string id.
+console.log('element.create componentId body contract:');
+
+const componentSend = (() => {
+	for (const p of skhema.description.properties) {
+		if (p.name === 'componentId' && p.routing?.send?.property === 'componentId') {
+			return p.routing.send;
+		}
+	}
+	throw new Error('element.create has no componentId body routing');
+})();
+
+// Reproduce how RoutingNode assembles the body: resolve each send.value through
+// the expression engine, set body[property], then run the node's preSend chain.
+const elementCreateBody = (componentIdParam) => {
+	const parameters = {
+		resource: 'element',
+		operation: 'create',
+		workspace: rl('list', 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+		componentType: 'diagnosis',
+		elementType: 'key_challenge',
+		content: 'x',
+	};
+	if (componentIdParam !== undefined) parameters.componentId = componentIdParam;
+
+	const body = { componentType: 'diagnosis', elementType: 'key_challenge', content: 'x' };
+	body[componentSend.property] = resolveUrl(componentSend.value, parameters);
+	presendPruneEmpty.call({}, { body });
+	return body;
+};
+
+const noComponentIdCases = [
+	['blank locator, From List mode', rl('list', '')],
+	['blank locator, By ID mode', rl('id', '')],
+	['locator omitted (schema default)', undefined],
+];
+for (const [label, param] of noComponentIdCases) {
+	check(`${label} → body has no componentId key`, () => {
+		const body = elementCreateBody(param);
+		assert.ok(
+			!Object.prototype.hasOwnProperty.call(body, 'componentId'),
+			`expected no componentId key, got ${JSON.stringify(body)}`,
+		);
+	});
+}
+
+const populatedCases = [
+	['populated From List mode', rl('list', 'c-44444444-dddd-4eee-8fff-000000000004')],
+	['populated By ID mode', rl('id', 'c-44444444-dddd-4eee-8fff-000000000004')],
+];
+for (const [label, param] of populatedCases) {
+	check(`${label} → body.componentId is the plain string id`, () => {
+		const body = elementCreateBody(param);
+		assert.strictEqual(body.componentId, 'c-44444444-dddd-4eee-8fff-000000000004');
+		assert.strictEqual(typeof body.componentId, 'string');
+	});
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

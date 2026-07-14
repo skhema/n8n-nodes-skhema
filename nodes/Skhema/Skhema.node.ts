@@ -4,6 +4,7 @@ import { elementDescription } from './resources/element';
 import { complianceDescription } from './resources/compliance';
 import { getWorkspaces } from './listSearch/getWorkspaces';
 import { getWorkspaceMembers } from './listSearch/getWorkspaceMembers';
+import { getWorkspaceComponents } from './listSearch/getWorkspaceComponents';
 import { getComplianceRequirements } from './listSearch/getComplianceRequirements';
 import { SKHEMA_API_BASE } from './shared/transport';
 
@@ -59,6 +60,7 @@ export class Skhema implements INodeType {
 		listSearch: {
 			getWorkspaces,
 			getWorkspaceMembers,
+			getWorkspaceComponents,
 			getComplianceRequirements,
 		},
 	};

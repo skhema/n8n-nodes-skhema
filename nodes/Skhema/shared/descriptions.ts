@@ -167,6 +167,40 @@ export const workspaceLocator: INodeProperties = {
 };
 
 /**
+ * Optional component-instance resource locator backed by `getWorkspaceComponents`.
+ * The loader reads the sibling `workspace` parameter, so any node using this
+ * locator must declare a `workspace` locator too. Omitted (blank) keeps the
+ * default behaviour; see the description on the element-create usage.
+ */
+export const componentLocator: INodeProperties = {
+	displayName: 'Component Instance',
+	name: 'componentId',
+	type: 'resourceLocator',
+	default: { mode: 'list', value: '' },
+	description:
+		'Optional. A workspace can hold multiple instances of one component type. Pick the instance to add this element to. Leave blank to use the default: the element lands in the first instance of the chosen component type by position, auto-created if none exists. Pick a workspace first to browse the list.',
+	modes: [
+		{
+			displayName: 'From List',
+			name: 'list',
+			type: 'list',
+			placeholder: 'Select a component instance...',
+			typeOptions: {
+				searchListMethod: 'getWorkspaceComponents',
+				searchable: true,
+			},
+		},
+		{
+			displayName: 'By ID',
+			name: 'id',
+			type: 'string',
+			hint: 'By ID accepts an expression, e.g. {{ $json.componentId }}',
+			placeholder: 'e.g. b1c2d3e4-0000-4000-8000-000000000001',
+		},
+	],
+};
+
+/**
  * Workspace-member resource locator backed by `getWorkspaceMembers`. The loader
  * reads the sibling `workspace` parameter, so any node using this locator must
  * declare a `workspace` locator too.
