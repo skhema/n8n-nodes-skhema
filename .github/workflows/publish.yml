@@ -57,7 +57,9 @@ jobs:
 
       - name: Upgrade npm to OIDC-capable version
         run: |
-          npm install -g npm@latest
+          # Pin the npm 11 line: OIDC needs >= 11.5.1, and npm@latest (12+)
+          # requires node >= 22.22, newer than the pinned runtime above.
+          npm install -g npm@11
           npm --version # must be >= 11.5.1
 
       - name: Install dependencies
