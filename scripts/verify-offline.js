@@ -69,7 +69,7 @@ check('operations per resource', () => {
 
 check('element-type validity matrix (mirrors Zapier ELEMENT_FLOW)', () => {
 	const expected = {
-		diagnosis: ['key_challenge', 'supporting_fact', 'impact'],
+		diagnosis: ['key_challenge', 'fact', 'impact'],
 		method: ['guiding_policy', 'competitor_move', 'scope', 'constraint'],
 		initiatives: [
 			'solution',
