@@ -16,7 +16,7 @@ export const COMPONENT_OPTIONS: INodePropertyOptions[] = [
 /** Human labels for every element type (mirrors ELEMENT_LABELS in Zapier). */
 export const ELEMENT_LABELS: Record<string, string> = {
 	key_challenge: 'Key Challenge',
-	supporting_fact: 'Supporting Fact',
+	fact: 'Fact',
 	impact: 'Impact',
 	guiding_policy: 'Guiding Policy',
 	competitor_move: 'Competitor Move',
@@ -43,7 +43,7 @@ export const ELEMENT_LABELS: Record<string, string> = {
  * pair server-side; this only scopes the dropdown per selected component.
  */
 export const ELEMENT_FLOW: Record<string, string[]> = {
-	diagnosis: ['key_challenge', 'supporting_fact', 'impact'],
+	diagnosis: ['key_challenge', 'fact', 'impact'],
 	method: ['guiding_policy', 'competitor_move', 'scope', 'constraint'],
 	initiatives: [
 		'solution',
