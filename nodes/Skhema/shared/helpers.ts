@@ -5,7 +5,7 @@ import type {
 	IN8nHttpFullResponse,
 	INodeExecutionData,
 } from 'n8n-workflow';
-import { skhemaApiRequest, SKHEMA_API_BASE, SKHEMA_AUTH_BASE } from './transport';
+import { skhemaApiRequest, SKHEMA_API_BASE, SKHEMA_USERINFO_URL } from './transport';
 
 const toItems = (data: IDataObject | IDataObject[]): INodeExecutionData[] =>
 	(Array.isArray(data) ? data : [data]).map((json) => ({ json }));
@@ -19,11 +19,7 @@ export async function presendOrganizationId(
 	this: IExecuteSingleFunctions,
 	requestOptions: IHttpRequestOptions,
 ): Promise<IHttpRequestOptions> {
-	const info = (await skhemaApiRequest.call(
-		this,
-		'GET',
-		`${SKHEMA_AUTH_BASE}/oauth/userinfo`,
-	)) as IDataObject;
+	const info = (await skhemaApiRequest.call(this, 'GET', SKHEMA_USERINFO_URL)) as IDataObject;
 	const organizationId = (info?.organization as IDataObject)?.id;
 	if (organizationId) {
 		requestOptions.body = {

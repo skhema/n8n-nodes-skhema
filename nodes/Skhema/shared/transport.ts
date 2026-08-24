@@ -11,6 +11,8 @@ import type {
 
 export const SKHEMA_API_BASE = 'https://api.skhema.com/v1';
 export const SKHEMA_AUTH_BASE = 'https://auth.skhema.com/api/auth';
+/** Native BetterAuth OAuth provider userinfo endpoint (advertised by the auth server's discovery document). */
+export const SKHEMA_USERINFO_URL = `${SKHEMA_AUTH_BASE}/oauth2/userinfo`;
 
 const CREDENTIAL_NAME = 'skhemaOAuth2Api';
 
