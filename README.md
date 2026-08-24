@@ -39,6 +39,10 @@ public client — no client secret). A connection represents your Skhema
 3. Click **Connect** and authorize as an organization admin or owner, selecting
    the organization the connection should act for.
 
+> **Upgrading to 0.3.0:** delete and re-create your Skhema credential. Saved
+> credentials keep the previous authorization endpoints, which no longer exist,
+> and tokens issued by them can no longer be refreshed.
+
 ## Trigger node — Skhema Trigger
 
 Instant, webhook-backed trigger — no polling. Subscriptions are registered

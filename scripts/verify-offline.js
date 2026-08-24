@@ -26,6 +26,7 @@ const { Skhema } = require('../dist/nodes/Skhema/Skhema.node.js');
 const { SkhemaTrigger } = require('../dist/nodes/SkhemaTrigger/SkhemaTrigger.node.js');
 const { SkhemaOAuth2Api } = require('../dist/credentials/SkhemaOAuth2Api.credentials.js');
 const { presendPruneEmpty } = require('../dist/nodes/Skhema/shared/helpers.js');
+const { SKHEMA_USERINFO_URL } = require('../dist/nodes/Skhema/shared/transport.js');
 
 let failures = 0;
 const check = (label, fn) => {
@@ -156,8 +157,12 @@ check('credential grant + scopes match the Zapier app', () => {
 		prop('scope'),
 		'openid profile email organizations organizations:read organizations:write offline_access',
 	);
-	assert.strictEqual(prop('authUrl'), 'https://auth.skhema.com/api/auth/oauth/authorize');
-	assert.strictEqual(prop('accessTokenUrl'), 'https://auth.skhema.com/api/auth/oauth/token');
+	assert.strictEqual(prop('authUrl'), 'https://auth.skhema.com/api/auth/oauth2/authorize');
+	assert.strictEqual(prop('accessTokenUrl'), 'https://auth.skhema.com/api/auth/oauth2/token');
+});
+
+check('userinfo endpoint points at the native provider', () => {
+	assert.strictEqual(SKHEMA_USERINFO_URL, 'https://auth.skhema.com/api/auth/oauth2/userinfo');
 });
 
 // ─── 2. Routing URL resolution with resource locators ───────────────────────

@@ -4,10 +4,13 @@ import type { Icon, ICredentialType, INodeProperties } from 'n8n-workflow';
  * OAuth2 credential for the Skhema public API (api.skhema.com/v1).
  *
  * Mirrors the Zapier integration's authentication (integrations/zapier/authentication.js):
- * an org admin authorizes a Skhema OAuth client, producing a service-account
- * token that represents the organization. Service-account tokens are already
- * BetterAuth JWTs, so n8n injects the access token directly as the bearer on
- * every /v1 request (no jwt-bridge exchange needed for the service-account path).
+ * an org admin authorizes a Skhema OAuth client and the organization is bound to
+ * the grant at consent, so the resulting token represents that organization.
+ * Access tokens are already BetterAuth JWTs, so n8n injects the access token
+ * directly as the bearer on every /v1 request (no jwt-bridge exchange needed).
+ *
+ * Endpoints are Skhema's native BetterAuth OAuth provider under
+ * /api/auth/oauth2/* — see https://auth.skhema.com/.well-known/oauth-authorization-server.
  *
  * Uses the Authorization Code + PKCE grant, which n8n's base `oAuth2Api`
  * credential supports via `grantType: 'pkce'` — matching the Zapier app's
@@ -46,14 +49,14 @@ export class SkhemaOAuth2Api implements ICredentialType {
 			displayName: 'Authorization URL',
 			name: 'authUrl',
 			type: 'hidden',
-			default: 'https://auth.skhema.com/api/auth/oauth/authorize',
+			default: 'https://auth.skhema.com/api/auth/oauth2/authorize',
 			required: true,
 		},
 		{
 			displayName: 'Access Token URL',
 			name: 'accessTokenUrl',
 			type: 'hidden',
-			default: 'https://auth.skhema.com/api/auth/oauth/token',
+			default: 'https://auth.skhema.com/api/auth/oauth2/token',
 			required: true,
 		},
 		{
