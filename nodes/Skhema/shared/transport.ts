@@ -19,9 +19,10 @@ const CREDENTIAL_NAME = 'skhemaOAuth2Api';
 /**
  * Authenticated request against the Skhema public API (or the auth server for
  * `resource` values that are already absolute URLs). The OAuth2 credential's
- * access token — a service-account BetterAuth JWT — is injected as the bearer
- * by n8n's request helper, mirroring the Zapier api-client's direct
- * service-account path (integrations/zapier/lib/api-client.js).
+ * access token — the user-grant BetterAuth JWT for the organization bound to
+ * the grant at consent — is injected as the bearer by n8n's request helper,
+ * mirroring the Zapier api-client's direct path
+ * (integrations/zapier/lib/api-client.js).
  */
 export async function skhemaApiRequest(
 	this:
