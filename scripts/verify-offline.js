@@ -218,12 +218,12 @@ const cases = [
 		params: (mode) => ({
 			resource: 'element',
 			operation: 'create',
-			project: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+			project: rl(mode, 'proj-11111111-aaaa-4bbb-8ccc-000000000001'),
 			componentType: 'diagnosis',
 			elementType: 'key_challenge',
 			content: 'x',
 		}),
-		expect: '/projects/ws-11111111-aaaa-4bbb-8ccc-000000000001/elements',
+		expect: '/projects/proj-11111111-aaaa-4bbb-8ccc-000000000001/elements',
 	},
 	{
 		label: 'compliance.find',
@@ -231,9 +231,9 @@ const cases = [
 		params: (mode) => ({
 			resource: 'compliance',
 			operation: 'find',
-			project: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+			project: rl(mode, 'proj-11111111-aaaa-4bbb-8ccc-000000000001'),
 		}),
-		expect: '/projects/ws-11111111-aaaa-4bbb-8ccc-000000000001/compliance',
+		expect: '/projects/proj-11111111-aaaa-4bbb-8ccc-000000000001/compliance',
 	},
 	{
 		label: 'compliance.complete',
@@ -241,12 +241,12 @@ const cases = [
 		params: (mode) => ({
 			resource: 'compliance',
 			operation: 'complete',
-			project: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
-			projectMemberId: rl(mode, 'wsm-22222222-bbbb-4ccc-8ddd-000000000002'),
+			project: rl(mode, 'proj-11111111-aaaa-4bbb-8ccc-000000000001'),
+			projectMemberId: rl(mode, 'pm-22222222-bbbb-4ccc-8ddd-000000000002'),
 			complianceId: rl(mode, 'c-33333333-cccc-4ddd-8eee-000000000003'),
 		}),
 		expect:
-			'/projects/ws-11111111-aaaa-4bbb-8ccc-000000000001/compliance/members/wsm-22222222-bbbb-4ccc-8ddd-000000000002/complete',
+			'/projects/proj-11111111-aaaa-4bbb-8ccc-000000000001/compliance/members/pm-22222222-bbbb-4ccc-8ddd-000000000002/complete',
 	},
 ];
 
@@ -285,7 +285,7 @@ const elementCreateBody = (componentIdParam) => {
 	const parameters = {
 		resource: 'element',
 		operation: 'create',
-		project: rl('list', 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+		project: rl('list', 'proj-11111111-aaaa-4bbb-8ccc-000000000001'),
 		componentType: 'diagnosis',
 		elementType: 'key_challenge',
 		content: 'x',

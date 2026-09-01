@@ -52,9 +52,11 @@ public client — no client secret). A connection represents your Skhema
 > from `/v1/workspaces…` to `/v1/projects…`. These parameter names are
 > serialised into your saved workflow JSON, so **existing workflows will show
 > the old parameters as unresolved after upgrading** — open each Skhema node
-> and Skhema Trigger node, re-select the resource/operation, and re-map any
-> expression that referenced `workspaceId`, `workspaceMemberId`, or
-> `workspaceFilter` (e.g. `{{ $json.newState.workspaceMemberId }}` →
+> and re-select its resource/operation; on the Skhema Trigger node, its saved
+> **Events** value `workspace.member_added` must be re-selected as
+> `project.member_added`. Re-map any expression that referenced `workspaceId`,
+> `workspaceMemberId`, or `workspaceFilter` (e.g.
+> `{{ $json.newState.workspaceMemberId }}` →
 > `{{ $json.newState.projectMemberId }}`) to the new field names before
 > reactivating the workflow.
 
