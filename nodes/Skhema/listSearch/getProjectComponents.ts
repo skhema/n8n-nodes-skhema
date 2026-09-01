@@ -7,26 +7,26 @@ import type {
 import { skhemaApiRequest } from '../shared/transport';
 
 /**
- * Backs the component-instance dropdown on Create Element. A workspace can hold
- * multiple instances of one component type; this reads the sibling `workspace`
- * locator, then lists that workspace's component instances via
- * GET /v1/workspaces/{id}/components. `value` is the component instance id, the
+ * Backs the component-instance dropdown on Create Element. A project can hold
+ * multiple instances of one component type; this reads the sibling `project`
+ * locator, then lists that project's component instances via
+ * GET /v1/projects/{id}/components. `value` is the component instance id, the
  * `name` carries the element count for disambiguation. Mirrors the Zapier hidden
- * `get_workspace_components` trigger and the Make `GetWorkspaceComponents` RPC.
+ * `get_project_components` trigger and the Make `GetProjectComponents` RPC.
  */
-export async function getWorkspaceComponents(
+export async function getProjectComponents(
 	this: ILoadOptionsFunctions,
 	filter?: string,
 ): Promise<INodeListSearchResult> {
-	const workspaceId = this.getNodeParameter('workspace', '', { extractValue: true }) as string;
-	if (!workspaceId) {
+	const projectId = this.getNodeParameter('project', '', { extractValue: true }) as string;
+	if (!projectId) {
 		return { results: [] };
 	}
 
 	const response = (await skhemaApiRequest.call(
 		this,
 		'GET',
-		`/workspaces/${workspaceId}/components`,
+		`/projects/${projectId}/components`,
 	)) as IDataObject;
 	const components = (response.components as IDataObject[]) ?? [];
 

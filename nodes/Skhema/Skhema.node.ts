@@ -1,10 +1,10 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
-import { workspaceDescription } from './resources/workspace';
+import { projectDescription } from './resources/project';
 import { elementDescription } from './resources/element';
 import { complianceDescription } from './resources/compliance';
-import { getWorkspaces } from './listSearch/getWorkspaces';
-import { getWorkspaceMembers } from './listSearch/getWorkspaceMembers';
-import { getWorkspaceComponents } from './listSearch/getWorkspaceComponents';
+import { getProjects } from './listSearch/getProjects';
+import { getProjectMembers } from './listSearch/getProjectMembers';
+import { getProjectComponents } from './listSearch/getProjectComponents';
 import { getComplianceRequirements } from './listSearch/getComplianceRequirements';
 import { SKHEMA_API_BASE } from './shared/transport';
 
@@ -17,7 +17,7 @@ export class Skhema implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Create workspaces and elements, find workspaces, and complete member compliance in Skhema',
+			'Create projects and elements, find projects, and complete member compliance in Skhema',
 		defaults: {
 			name: 'Skhema',
 		},
@@ -46,11 +46,11 @@ export class Skhema implements INodeType {
 				options: [
 					{ name: 'Compliance', value: 'compliance' },
 					{ name: 'Element', value: 'element' },
-					{ name: 'Workspace', value: 'workspace' },
+					{ name: 'Project', value: 'project' },
 				],
-				default: 'workspace',
+				default: 'project',
 			},
-			...workspaceDescription,
+			...projectDescription,
 			...elementDescription,
 			...complianceDescription,
 		],
@@ -58,9 +58,9 @@ export class Skhema implements INodeType {
 
 	methods = {
 		listSearch: {
-			getWorkspaces,
-			getWorkspaceMembers,
-			getWorkspaceComponents,
+			getProjects,
+			getProjectMembers,
+			getProjectComponents,
 			getComplianceRequirements,
 		},
 	};

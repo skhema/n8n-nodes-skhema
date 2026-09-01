@@ -11,9 +11,9 @@ const toItems = (data: IDataObject | IDataObject[]): INodeExecutionData[] =>
 	(Array.isArray(data) ? data : [data]).map((json) => ({ json }));
 
 /**
- * preSend for Create Workspace: resolves the connected organization id from the
+ * preSend for Create Project: resolves the connected organization id from the
  * OAuth userinfo endpoint and injects it into the request body, mirroring the
- * Zapier create_workspace which sends `organizationId: bundle.authData.organizationId`.
+ * Zapier create_project which sends `organizationId: bundle.authData.organizationId`.
  */
 export async function presendOrganizationId(
 	this: IExecuteSingleFunctions,
@@ -31,17 +31,17 @@ export async function presendOrganizationId(
 }
 
 /**
- * preSend for Find Workspace: when an exact workspace is selected, repoint the
+ * preSend for Find Project: when an exact project is selected, repoint the
  * request from the list endpoint to the by-id endpoint (mirrors the Zapier
- * find_workspace direct-lookup branch).
+ * find_project direct-lookup branch).
  */
-export async function presendWorkspaceLookup(
+export async function presendProjectLookup(
 	this: IExecuteSingleFunctions,
 	requestOptions: IHttpRequestOptions,
 ): Promise<IHttpRequestOptions> {
-	const workspaceId = this.getNodeParameter('workspace', '', { extractValue: true }) as string;
-	if (workspaceId) {
-		requestOptions.url = `${SKHEMA_API_BASE}/workspaces/${workspaceId}`;
+	const projectId = this.getNodeParameter('project', '', { extractValue: true }) as string;
+	if (projectId) {
+		requestOptions.url = `${SKHEMA_API_BASE}/projects/${projectId}`;
 	}
 	return requestOptions;
 }
@@ -85,38 +85,38 @@ export async function presendComplete(
 	return requestOptions;
 }
 
-/** postReceive for Create Workspace: unwrap `{ workspace }` -> the workspace. */
-export async function unwrapWorkspaceCreate(
+/** postReceive for Create Project: unwrap `{ project }` -> the project. */
+export async function unwrapProjectCreate(
 	this: IExecuteSingleFunctions,
 	_items: INodeExecutionData[],
 	response: IN8nHttpFullResponse,
 ): Promise<INodeExecutionData[]> {
 	const body = response.body as IDataObject;
-	return toItems((body.workspace as IDataObject) ?? body);
+	return toItems((body.project as IDataObject) ?? body);
 }
 
 /**
- * postReceive for Find Workspace: handles both the by-id (`{ workspace }`) and
- * the list (`{ workspaces }`) responses, then filters by the `name` substring
+ * postReceive for Find Project: handles both the by-id (`{ project }`) and
+ * the list (`{ projects }`) responses, then filters by the `name` substring
  * client-side (the /v1 list endpoint has no server-side name filter).
  */
-export async function unwrapWorkspaceFind(
+export async function unwrapProjectFind(
 	this: IExecuteSingleFunctions,
 	_items: INodeExecutionData[],
 	response: IN8nHttpFullResponse,
 ): Promise<INodeExecutionData[]> {
 	const body = response.body as IDataObject;
-	if (body.workspace) {
-		return toItems(body.workspace as IDataObject);
+	if (body.project) {
+		return toItems(body.project as IDataObject);
 	}
-	const workspaces = (body.workspaces as IDataObject[]) ?? [];
+	const projects = (body.projects as IDataObject[]) ?? [];
 	const name = (this.getNodeParameter('name', '') as string) ?? '';
 	if (!name) {
-		return toItems(workspaces);
+		return toItems(projects);
 	}
 	const needle = name.toLowerCase();
 	return toItems(
-		workspaces.filter((w) =>
+		projects.filter((w) =>
 			String(w.name ?? '')
 				.toLowerCase()
 				.includes(needle),

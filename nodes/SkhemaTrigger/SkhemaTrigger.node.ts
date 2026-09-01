@@ -8,14 +8,14 @@ import {
 	type IWebhookResponseData,
 } from 'n8n-workflow';
 import { skhemaApiRequest } from '../Skhema/shared/transport';
-import { workspaceLocator } from '../Skhema/shared/descriptions';
-import { getWorkspaces } from '../Skhema/listSearch/getWorkspaces';
+import { projectLocator } from '../Skhema/shared/descriptions';
+import { getProjects } from '../Skhema/listSearch/getProjects';
 
 const EVENT_MEMBER_ADDED = 'member.added';
-const EVENT_WORKSPACE_MEMBER_ADDED = 'workspace.member_added';
+const EVENT_PROJECT_MEMBER_ADDED = 'project.member_added';
 
 /**
- * Best-effort hydration of the joiner's name/email from the org or workspace
+ * Best-effort hydration of the joiner's name/email from the org or project
  * member list, mirroring the Zapier triggers on main. Non-auth failures return
  * `{}` so the trigger still fires; only auth failures (surfaced by n8n's request
  * helper) propagate. The raw event envelope is preserved and friendly
@@ -31,18 +31,17 @@ async function hydrate(context: IWebhookFunctions, envelope: IDataObject): Promi
 			const res = (await skhemaApiRequest.call(context, 'GET', '/members')) as IDataObject;
 			const members = (res.members as IDataObject[]) ?? [];
 			member = members.find((m) => m.userId === newState.userId);
-		} else if (type === EVENT_WORKSPACE_MEMBER_ADDED) {
-			const workspaceId =
-				(envelope.workspaceId as string) ??
-				((envelope.metadata as IDataObject)?.workspaceId as string);
-			if (workspaceId) {
+		} else if (type === EVENT_PROJECT_MEMBER_ADDED) {
+			const projectId =
+				(envelope.projectId as string) ?? ((envelope.metadata as IDataObject)?.projectId as string);
+			if (projectId) {
 				const res = (await skhemaApiRequest.call(
 					context,
 					'GET',
-					`/workspaces/${workspaceId}/members`,
+					`/projects/${projectId}/members`,
 				)) as IDataObject;
 				const members = (res.members as IDataObject[]) ?? [];
-				member = members.find((m) => m.workspaceMemberId === newState.workspaceMemberId);
+				member = members.find((m) => m.projectMemberId === newState.projectMemberId);
 			}
 		}
 	} catch {
@@ -60,10 +59,10 @@ async function hydrate(context: IWebhookFunctions, envelope: IDataObject): Promi
 		joined_at: member?.joinedAt ?? null,
 	};
 
-	// Flattened, filterable pending-compliance summaries for the workspace event.
+	// Flattened, filterable pending-compliance summaries for the project event.
 	// n8n IF/Filter nodes can't do boolean logic over an array of objects, and a
 	// real record with an empty array leaves the line-item shape unlearnable.
-	if (type === EVENT_WORKSPACE_MEMBER_ADDED) {
+	if (type === EVENT_PROJECT_MEMBER_ADDED) {
 		const pending = ((envelope.metadata as IDataObject)?.pendingCompliance as IDataObject[]) ?? [];
 		output.has_pending_compliance = pending.length > 0;
 		output.pending_compliance_count = pending.length;
@@ -81,7 +80,7 @@ export class SkhemaTrigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["events"].join(", ")}}',
-		description: 'Starts a workflow when a member joins the organization or a workspace',
+		description: 'Starts a workflow when a member joins the organization or a project',
 		defaults: {
 			name: 'Skhema Trigger',
 		},
@@ -116,21 +115,21 @@ export class SkhemaTrigger implements INodeType {
 						description: 'A new member joins your Skhema organization',
 					},
 					{
-						name: 'New Workspace Member',
-						value: EVENT_WORKSPACE_MEMBER_ADDED,
+						name: 'New Project Member',
+						value: EVENT_PROJECT_MEMBER_ADDED,
 						description:
-							'A new member joins a workspace (payload carries pendingCompliance for the member)',
+							'A new member joins a project (payload carries pendingCompliance for the member)',
 					},
 				],
 			},
 			{
-				...workspaceLocator,
-				displayName: 'Workspace',
-				name: 'workspaceFilter',
+				...projectLocator,
+				displayName: 'Project',
+				name: 'projectFilter',
 				required: false,
 				description:
-					'Optional. Restrict New Workspace Member events to a single workspace; leave blank to fire for every workspace in the organization.',
-				displayOptions: { show: { events: [EVENT_WORKSPACE_MEMBER_ADDED] } },
+					'Optional. Restrict New Project Member events to a single project; leave blank to fire for every project in the organization.',
+				displayOptions: { show: { events: [EVENT_PROJECT_MEMBER_ADDED] } },
 			},
 		],
 		usableAsTool: true,
@@ -138,10 +137,10 @@ export class SkhemaTrigger implements INodeType {
 
 	methods = {
 		listSearch: {
-			// Backs the optional Workspace filter's "From List" mode (the shared
-			// workspaceLocator references searchListMethod 'getWorkspaces', which
+			// Backs the optional Project filter's "From List" mode (the shared
+			// projectLocator references searchListMethod 'getProjects', which
 			// must be registered on every node that uses the locator).
-			getWorkspaces,
+			getProjects,
 		},
 	};
 
@@ -202,16 +201,15 @@ export class SkhemaTrigger implements INodeType {
 		const envelope = this.getBodyData() as IDataObject;
 		const type = envelope.type as string | undefined;
 
-		// Client-side workspace scoping for New Workspace Member (the subscription
-		// is org-wide). Drop events for other workspaces without triggering.
-		if (type === EVENT_WORKSPACE_MEMBER_ADDED) {
-			const wanted = this.getNodeParameter('workspaceFilter', '', {
+		// Client-side project scoping for New Project Member (the subscription
+		// is org-wide). Drop events for other projects without triggering.
+		if (type === EVENT_PROJECT_MEMBER_ADDED) {
+			const wanted = this.getNodeParameter('projectFilter', '', {
 				extractValue: true,
 			}) as string;
-			const eventWorkspaceId =
-				(envelope.workspaceId as string) ??
-				((envelope.metadata as IDataObject)?.workspaceId as string);
-			if (wanted && eventWorkspaceId !== wanted) {
+			const eventProjectId =
+				(envelope.projectId as string) ?? ((envelope.metadata as IDataObject)?.projectId as string);
+			if (wanted && eventProjectId !== wanted) {
 				return {};
 			}
 		}
