@@ -136,23 +136,23 @@ export const elementTypeProperties: INodeProperties[] = [
 	},
 ];
 
-/** Workspace resource locator backed by the `getWorkspaces` list-search loader. */
-export const workspaceLocator: INodeProperties = {
-	displayName: 'Workspace',
-	name: 'workspace',
+/** Project resource locator backed by the `getProjects` list-search loader. */
+export const projectLocator: INodeProperties = {
+	displayName: 'Project',
+	name: 'project',
 	type: 'resourceLocator',
 	default: { mode: 'list', value: '' },
 	required: true,
 	description:
-		'The workspace to act on. In the New Workspace Member flow this is usually mapped from the trigger rather than selected.',
+		'The project to act on. In the New Project Member flow this is usually mapped from the trigger rather than selected.',
 	modes: [
 		{
 			displayName: 'From List',
 			name: 'list',
 			type: 'list',
-			placeholder: 'Select a workspace...',
+			placeholder: 'Select a project...',
 			typeOptions: {
-				searchListMethod: 'getWorkspaces',
+				searchListMethod: 'getProjects',
 				searchable: true,
 			},
 		},
@@ -160,16 +160,16 @@ export const workspaceLocator: INodeProperties = {
 			displayName: 'By ID',
 			name: 'id',
 			type: 'string',
-			hint: 'By ID accepts an expression, e.g. {{ $json.workspaceId }}',
+			hint: 'By ID accepts an expression, e.g. {{ $json.projectId }}',
 			placeholder: 'e.g. c562f038-0406-4d40-9c9a-b73c84e82de7',
 		},
 	],
 };
 
 /**
- * Optional component-instance resource locator backed by `getWorkspaceComponents`.
- * The loader reads the sibling `workspace` parameter, so any node using this
- * locator must declare a `workspace` locator too. Omitted (blank) keeps the
+ * Optional component-instance resource locator backed by `getProjectComponents`.
+ * The loader reads the sibling `project` parameter, so any node using this
+ * locator must declare a `project` locator too. Omitted (blank) keeps the
  * default behaviour; see the description on the element-create usage.
  */
 export const componentLocator: INodeProperties = {
@@ -178,7 +178,7 @@ export const componentLocator: INodeProperties = {
 	type: 'resourceLocator',
 	default: { mode: 'list', value: '' },
 	description:
-		'Optional. A workspace can hold multiple instances of one component type. Pick the instance to add this element to. Leave blank to use the default: the element lands in the first instance of the chosen component type by position, auto-created if none exists. Pick a workspace first to browse the list.',
+		'Optional. A project can hold multiple instances of one component type. Pick the instance to add this element to. Leave blank to use the default: the element lands in the first instance of the chosen component type by position, auto-created if none exists. Pick a project first to browse the list.',
 	modes: [
 		{
 			displayName: 'From List',
@@ -186,7 +186,7 @@ export const componentLocator: INodeProperties = {
 			type: 'list',
 			placeholder: 'Select a component instance...',
 			typeOptions: {
-				searchListMethod: 'getWorkspaceComponents',
+				searchListMethod: 'getProjectComponents',
 				searchable: true,
 			},
 		},
@@ -201,18 +201,18 @@ export const componentLocator: INodeProperties = {
 };
 
 /**
- * Workspace-member resource locator backed by `getWorkspaceMembers`. The loader
- * reads the sibling `workspace` parameter, so any node using this locator must
- * declare a `workspace` locator too.
+ * Project-member resource locator backed by `getProjectMembers`. The loader
+ * reads the sibling `project` parameter, so any node using this locator must
+ * declare a `project` locator too.
  */
-export const workspaceMemberLocator: INodeProperties = {
-	displayName: 'Workspace Member',
-	name: 'workspaceMemberId',
+export const projectMemberLocator: INodeProperties = {
+	displayName: 'Project Member',
+	name: 'projectMemberId',
 	type: 'resourceLocator',
 	default: { mode: 'list', value: '' },
 	required: true,
 	description:
-		"The member's workspaceMember ID (not their user ID). Usually mapped from the New Workspace Member trigger rather than selected. Pick a workspace first to browse the list instead.",
+		"The member's projectMember ID (not their user ID). Usually mapped from the New Project Member trigger rather than selected. Pick a project first to browse the list instead.",
 	modes: [
 		{
 			displayName: 'From List',
@@ -220,7 +220,7 @@ export const workspaceMemberLocator: INodeProperties = {
 			type: 'list',
 			placeholder: 'Select a member...',
 			typeOptions: {
-				searchListMethod: 'getWorkspaceMembers',
+				searchListMethod: 'getProjectMembers',
 				searchable: true,
 			},
 		},
@@ -228,7 +228,7 @@ export const workspaceMemberLocator: INodeProperties = {
 			displayName: 'By ID',
 			name: 'id',
 			type: 'string',
-			hint: 'By ID accepts an expression, e.g. {{ $json.newState.workspaceMemberId }}',
+			hint: 'By ID accepts an expression, e.g. {{ $json.newState.projectMemberId }}',
 			placeholder: 'e.g. a1b2c3d4-0000-4000-8000-000000000021',
 		},
 	],

@@ -3,7 +3,7 @@ import {
 	COMPONENT_OPTIONS,
 	componentLocator,
 	elementTypeProperties,
-	workspaceLocator,
+	projectLocator,
 } from '../../shared/descriptions';
 import { presendPruneEmpty, unwrapElementCreate } from '../../shared/helpers';
 
@@ -22,7 +22,7 @@ export const elementDescription: INodeProperties[] = [
 				name: 'Create',
 				value: 'create',
 				action: 'Create an element',
-				description: 'Create an element (a strategy building block) in a workspace component',
+				description: 'Create an element (a strategy building block) in a project component',
 				routing: {
 					request: {
 						method: 'POST',
@@ -31,7 +31,7 @@ export const elementDescription: INodeProperties[] = [
 						// behaviors: if the expression engine already extracted the
 						// locator (`__rl`) to a string, `.value` is undefined and the
 						// fallback returns the string; otherwise `.value` is the id.
-						url: '=/workspaces/{{ $parameter["workspace"].value ?? $parameter["workspace"] }}/elements',
+						url: '=/projects/{{ $parameter["project"].value ?? $parameter["project"] }}/elements',
 					},
 					send: { preSend: [presendPruneEmpty] },
 					output: { postReceive: [unwrapElementCreate] },
@@ -41,7 +41,7 @@ export const elementDescription: INodeProperties[] = [
 		default: 'create',
 	},
 	{
-		...workspaceLocator,
+		...projectLocator,
 		displayOptions: { show: showForElementCreate },
 	},
 	{

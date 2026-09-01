@@ -12,7 +12,7 @@
  *    engine (the same path n8n-core's RoutingNode uses), with `__rl` locator
  *    objects in BOTH "From List" and manual "By ID" modes, asserting the
  *    extracted id lands in the URL. Guards against the
- *    /workspaces/[object Object]/... class of bug.
+ *    /projects/[object Object]/... class of bug.
  *
  * No n8n server involved; uses only the installed n8n-workflow peer dep.
  */
@@ -50,7 +50,7 @@ check('action node resources', () => {
 	const resource = skhema.description.properties.find((p) => p.name === 'resource');
 	assert.deepStrictEqual(
 		resource.options.map((o) => o.value).sort(),
-		['compliance', 'element', 'workspace'],
+		['compliance', 'element', 'project'],
 	);
 });
 
@@ -62,7 +62,7 @@ check('operations per resource', () => {
 		actions[res] = p.options.map((o) => o.value).sort();
 	}
 	assert.deepStrictEqual(actions, {
-		workspace: ['create', 'find'],
+		project: ['create', 'find'],
 		element: ['create'],
 		compliance: ['complete', 'find'],
 	});
@@ -94,9 +94,9 @@ check('element-type validity matrix (mirrors Zapier ELEMENT_FLOW)', () => {
 check('listSearch loaders', () => {
 	assert.deepStrictEqual(Object.keys(skhema.methods.listSearch).sort(), [
 		'getComplianceRequirements',
-		'getWorkspaceComponents',
-		'getWorkspaceMembers',
-		'getWorkspaces',
+		'getProjectComponents',
+		'getProjectMembers',
+		'getProjects',
 	]);
 });
 
@@ -104,7 +104,7 @@ check('trigger events + webhook lifecycle', () => {
 	const events = trigger.description.properties.find((p) => p.name === 'events');
 	assert.deepStrictEqual(
 		events.options.map((o) => o.value).sort(),
-		['member.added', 'workspace.member_added'],
+		['member.added', 'project.member_added'],
 	);
 	assert.deepStrictEqual(Object.keys(trigger.webhookMethods.default).sort(), [
 		'checkExists',
@@ -143,10 +143,10 @@ for (const [label, instance] of [
 	});
 }
 
-check('trigger registers the shared getWorkspaces loader', () => {
-	assert.strictEqual(typeof trigger.methods.listSearch.getWorkspaces, 'function');
+check('trigger registers the shared getProjects loader', () => {
+	assert.strictEqual(typeof trigger.methods.listSearch.getProjects, 'function');
 	// Same shared implementation as the action node, not a divergent copy.
-	assert.strictEqual(trigger.methods.listSearch.getWorkspaces, skhema.methods.listSearch.getWorkspaces);
+	assert.strictEqual(trigger.methods.listSearch.getProjects, skhema.methods.listSearch.getProjects);
 });
 
 check('credential grant + scopes match the Zapier app', () => {
@@ -218,12 +218,12 @@ const cases = [
 		params: (mode) => ({
 			resource: 'element',
 			operation: 'create',
-			workspace: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+			project: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
 			componentType: 'diagnosis',
 			elementType: 'key_challenge',
 			content: 'x',
 		}),
-		expect: '/workspaces/ws-11111111-aaaa-4bbb-8ccc-000000000001/elements',
+		expect: '/projects/ws-11111111-aaaa-4bbb-8ccc-000000000001/elements',
 	},
 	{
 		label: 'compliance.find',
@@ -231,9 +231,9 @@ const cases = [
 		params: (mode) => ({
 			resource: 'compliance',
 			operation: 'find',
-			workspace: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+			project: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
 		}),
-		expect: '/workspaces/ws-11111111-aaaa-4bbb-8ccc-000000000001/compliance',
+		expect: '/projects/ws-11111111-aaaa-4bbb-8ccc-000000000001/compliance',
 	},
 	{
 		label: 'compliance.complete',
@@ -241,12 +241,12 @@ const cases = [
 		params: (mode) => ({
 			resource: 'compliance',
 			operation: 'complete',
-			workspace: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
-			workspaceMemberId: rl(mode, 'wsm-22222222-bbbb-4ccc-8ddd-000000000002'),
+			project: rl(mode, 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+			projectMemberId: rl(mode, 'wsm-22222222-bbbb-4ccc-8ddd-000000000002'),
 			complianceId: rl(mode, 'c-33333333-cccc-4ddd-8eee-000000000003'),
 		}),
 		expect:
-			'/workspaces/ws-11111111-aaaa-4bbb-8ccc-000000000001/compliance/members/wsm-22222222-bbbb-4ccc-8ddd-000000000002/complete',
+			'/projects/ws-11111111-aaaa-4bbb-8ccc-000000000001/compliance/members/wsm-22222222-bbbb-4ccc-8ddd-000000000002/complete',
 	},
 ];
 
@@ -285,7 +285,7 @@ const elementCreateBody = (componentIdParam) => {
 	const parameters = {
 		resource: 'element',
 		operation: 'create',
-		workspace: rl('list', 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
+		project: rl('list', 'ws-11111111-aaaa-4bbb-8ccc-000000000001'),
 		componentType: 'diagnosis',
 		elementType: 'key_challenge',
 		content: 'x',

@@ -7,31 +7,31 @@ import type {
 import { skhemaApiRequest } from '../shared/transport';
 
 /**
- * Backs the workspace-member dropdown on Complete Member Compliance. Reads the
- * sibling `workspace` locator, then lists that workspace's members via
- * GET /v1/workspaces/{id}/members. `value` is the workspaceMemberId (the id the
- * compliance action needs). Mirrors the Zapier hidden `get_workspace_members`
+ * Backs the project-member dropdown on Complete Member Compliance. Reads the
+ * sibling `project` locator, then lists that project's members via
+ * GET /v1/projects/{id}/members. `value` is the projectMemberId (the id the
+ * compliance action needs). Mirrors the Zapier hidden `get_project_members`
  * trigger.
  */
-export async function getWorkspaceMembers(
+export async function getProjectMembers(
 	this: ILoadOptionsFunctions,
 	filter?: string,
 ): Promise<INodeListSearchResult> {
-	const workspaceId = this.getNodeParameter('workspace', '', { extractValue: true }) as string;
-	if (!workspaceId) {
+	const projectId = this.getNodeParameter('project', '', { extractValue: true }) as string;
+	if (!projectId) {
 		return { results: [] };
 	}
 
 	const response = (await skhemaApiRequest.call(
 		this,
 		'GET',
-		`/workspaces/${workspaceId}/members`,
+		`/projects/${projectId}/members`,
 	)) as IDataObject;
 	const members = (response.members as IDataObject[]) ?? [];
 
 	let results: INodeListSearchItems[] = members.map((m) => ({
 		name: String(m.name ?? m.email ?? m.userId),
-		value: String(m.workspaceMemberId),
+		value: String(m.projectMemberId),
 	}));
 
 	if (filter) {

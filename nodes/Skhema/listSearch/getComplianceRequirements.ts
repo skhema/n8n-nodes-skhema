@@ -8,23 +8,23 @@ import { skhemaApiRequest } from '../shared/transport';
 
 /**
  * Backs the compliance-requirement dropdown on Complete Member Compliance.
- * Reads the sibling `workspace` locator, then lists that workspace's compliance
- * requirements via GET /v1/workspaces/{id}/compliance. Mirrors the Zapier hidden
+ * Reads the sibling `project` locator, then lists that project's compliance
+ * requirements via GET /v1/projects/{id}/compliance. Mirrors the Zapier hidden
  * `get_compliance_requirements` trigger.
  */
 export async function getComplianceRequirements(
 	this: ILoadOptionsFunctions,
 	filter?: string,
 ): Promise<INodeListSearchResult> {
-	const workspaceId = this.getNodeParameter('workspace', '', { extractValue: true }) as string;
-	if (!workspaceId) {
+	const projectId = this.getNodeParameter('project', '', { extractValue: true }) as string;
+	if (!projectId) {
 		return { results: [] };
 	}
 
 	const response = (await skhemaApiRequest.call(
 		this,
 		'GET',
-		`/workspaces/${workspaceId}/compliance`,
+		`/projects/${projectId}/compliance`,
 	)) as IDataObject;
 	const compliance = (response.compliance as IDataObject[]) ?? [];
 

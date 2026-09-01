@@ -7,18 +7,18 @@ import type {
 import { skhemaApiRequest } from '../shared/transport';
 
 /**
- * Backs the workspace dropdown. Lists the connected organization's workspaces
- * via GET /v1/workspaces (org scoped by the connection token). Mirrors the
- * Zapier hidden `get_all_workspaces` trigger.
+ * Backs the project dropdown. Lists the connected organization's projects
+ * via GET /v1/projects (org scoped by the connection token). Mirrors the
+ * Zapier hidden `get_all_projects` trigger.
  */
-export async function getWorkspaces(
+export async function getProjects(
 	this: ILoadOptionsFunctions,
 	filter?: string,
 ): Promise<INodeListSearchResult> {
-	const response = (await skhemaApiRequest.call(this, 'GET', '/workspaces')) as IDataObject;
-	const workspaces = (response.workspaces as IDataObject[]) ?? [];
+	const response = (await skhemaApiRequest.call(this, 'GET', '/projects')) as IDataObject;
+	const projects = (response.projects as IDataObject[]) ?? [];
 
-	let results: INodeListSearchItems[] = workspaces.map((w) => ({
+	let results: INodeListSearchItems[] = projects.map((w) => ({
 		name: String(w.name ?? w.id),
 		value: String(w.id),
 	}));

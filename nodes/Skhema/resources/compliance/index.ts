@@ -1,9 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import {
-	complianceLocator,
-	workspaceLocator,
-	workspaceMemberLocator,
-} from '../../shared/descriptions';
+import { complianceLocator, projectLocator, projectMemberLocator } from '../../shared/descriptions';
 import { presendComplete, unwrapCompliance, unwrapMemberCompliance } from '../../shared/helpers';
 
 const showForCompliance = { resource: ['compliance'] };
@@ -20,14 +16,14 @@ export const complianceDescription: INodeProperties[] = [
 				name: 'Find Requirement',
 				value: 'find',
 				action: 'Find a compliance requirement',
-				description: "List a workspace's compliance requirements",
+				description: "List a project's compliance requirements",
 				routing: {
 					request: {
 						method: 'GET',
 						// See element/index.ts: extract the resource-locator id in URL
 						// expressions (`.value ?? param` is safe whether or not the
 						// engine pre-extracts `__rl` values).
-						url: '=/workspaces/{{ $parameter["workspace"].value ?? $parameter["workspace"] }}/compliance',
+						url: '=/projects/{{ $parameter["project"].value ?? $parameter["project"] }}/compliance',
 					},
 					output: { postReceive: [unwrapCompliance] },
 				},
@@ -37,11 +33,11 @@ export const complianceDescription: INodeProperties[] = [
 				value: 'complete',
 				action: 'Complete member compliance',
 				description:
-					'Mark a workspace member as having completed a compliance requirement (release the access gate for requirements completed via your own process, e.g. DocuSign)',
+					'Mark a project member as having completed a compliance requirement (release the access gate for requirements completed via your own process, e.g. DocuSign)',
 				routing: {
 					request: {
 						method: 'POST',
-						url: '=/workspaces/{{ $parameter["workspace"].value ?? $parameter["workspace"] }}/compliance/members/{{ $parameter["workspaceMemberId"].value ?? $parameter["workspaceMemberId"] }}/complete',
+						url: '=/projects/{{ $parameter["project"].value ?? $parameter["project"] }}/compliance/members/{{ $parameter["projectMemberId"].value ?? $parameter["projectMemberId"] }}/complete',
 					},
 					send: { preSend: [presendComplete] },
 					output: { postReceive: [unwrapMemberCompliance] },
@@ -53,19 +49,19 @@ export const complianceDescription: INodeProperties[] = [
 
 	// ─── Find Requirement ──────────────────────────────────────────────────────
 	{
-		...workspaceLocator,
-		description: 'The workspace to list compliance requirements for',
+		...projectLocator,
+		description: 'The project to list compliance requirements for',
 		displayOptions: { show: { ...showForCompliance, operation: ['find'] } },
 	},
 
 	// ─── Complete Member Compliance ────────────────────────────────────────────
 	{
-		...workspaceLocator,
-		description: 'The workspace this compliance requirement belongs to',
+		...projectLocator,
+		description: 'The project this compliance requirement belongs to',
 		displayOptions: { show: { ...showForCompliance, operation: ['complete'] } },
 	},
 	{
-		...workspaceMemberLocator,
+		...projectMemberLocator,
 		displayOptions: { show: { ...showForCompliance, operation: ['complete'] } },
 	},
 	{
